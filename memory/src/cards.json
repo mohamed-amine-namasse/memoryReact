@@ -1,0 +1,30 @@
+[
+  {
+    "id": "A",
+    "pair_id": "chat",
+    "content": "Chat",
+    "is_flipped": false,
+    "is_matched": false
+  },
+  {
+    "id": "B",
+    "pair_id": "chien",
+    "content": "Chien",
+    "is_flipped": false,
+    "is_matched": false
+  },
+  {
+    "id": "C",
+    "pair_id": "chat",
+    "content": "Chat",
+    "is_flipped": false,
+    "is_matched": false
+  },
+  {
+    "id": "D",
+    "pair_id": "chien",
+    "content": "Chien",
+    "is_flipped": false,
+    "is_matched": false
+  }
+]
