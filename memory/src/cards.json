@@ -1,30 +1,8 @@
 [
-  {
-    "id": "A",
-    "pair_id": "chat",
-    "content": "Chat",
-    "is_flipped": false,
-    "is_matched": false
-  },
-  {
-    "id": "B",
-    "pair_id": "chien",
-    "content": "Chien",
-    "is_flipped": false,
-    "is_matched": false
-  },
-  {
-    "id": "C",
-    "pair_id": "chat",
-    "content": "Chat",
-    "is_flipped": false,
-    "is_matched": false
-  },
-  {
-    "id": "D",
-    "pair_id": "chien",
-    "content": "Chien",
-    "is_flipped": false,
-    "is_matched": false
-  }
+  { "id": "1", "pairId": "techno", "content": "./images/techno.jpg" },
+  { "id": "2", "pairId": "canon", "content": "./images/canon.jpg" },
+  { "id": "3", "pairId": "dragon", "content": "./images/dragon.jpg" },
+  { "id": "4", "pairId": "juge", "content": "./images/juge.jpg" },
+  { "id": "5", "pairId": "guerrier", "content": "./images/guerrier.jpg" },
+  { "id": "6", "pairId": "mogmole", "content": "./images/mogmole.jpg" }
 ]
