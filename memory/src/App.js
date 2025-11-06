@@ -133,7 +133,7 @@ const App = () => {
 body { 
     margin: 0; 
     font-family: 'Inter', sans-serif; 
-    background-color: #0F172A; /* Fond sombre */
+    background-color: black; /* Fond sombre */
 }
 
 /* Conteneur principal */
@@ -185,175 +185,173 @@ body {
     color: var(--color-primary); 
 }
 
-/* GRILLE DE CARTES */
-.card-grid {
-    display: grid; 
-    grid-template-columns: repeat(4, 1fr); 
-    gap: 1.25rem; 
-    width: 100%;
-    max-width: 700px; 
-    margin: 0 auto;
-    padding: 1rem;
-}
+ /* GRILLE DE CARTES */
+      .card-grid {
+          display: grid; 
+          grid-template-columns: repeat(4, 1fr); 
+          gap: 1.25rem; 
+          width: 100%;
+          max-width: 1200px; 
+          margin: 0 auto;
+          padding: 1rem;
+      }
+      
+      /* COMPOSANT CARTE (Conteneur extérieur) */
+      .card-container {
+          position: relative;
+          width: 100%; 
+          height: 0;
+          padding-top: 100%; /* Maintient un ratio 1:1 */
+          cursor: pointer; 
+          perspective: 1000px; /* ESSENTIEL pour l'effet 3D */
+          border-radius: 0.75rem;
+      }
+      
+      /* Le contenu englobe les deux faces et tourne */
+      .card-content {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transform-style: preserve-3d; /* ESSENTIEL: active la 3D pour les enfants */
+          
+      }
+      
+      /* Quand la carte est retournée (flip) */
+      .card-container.is-flipped .card-content {
+          transform: rotateY(180deg);
+      }
+      
+      /* Styles pour les cartes matchées (dos visible et non cliquable) */
+      .card-container.is-matched-static {
+          cursor: default;
+          pointer-events: none;
+          filter: grayscale(100%);  
 
-/* COMPOSANT CARTE (Conteneur extérieur) */
-.card-container {
-    position: relative;
-    width: 100%; 
-    height: 0;
-    padding-top: 100%; /* Maintient un ratio 1:1 */
-    cursor: pointer; 
-    perspective: 1000px; /* 🔑 ESSENTIEL pour l'effet 3D */
-    border-radius: 0.75rem;
-}
+      }
+     
+      
+      /* Styles communs aux faces */
+      .card-face {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center; 
+          backface-visibility: hidden; /* ESSENTIEL: masque la face opposée pendant le flip */
+          overflow: hidden;
+          
+      }
+      
+      /* Recto de la carte (Contenu réel) */
+      .card-face-front {
+          /* Le recto est tourné par défaut pour être vu APRÈS la rotation du parent. */
+          transform: rotateY(180deg); 
+      }
+      
+      /* Verso de la carte (Couverture/Dos) */
+      .card-face-back {
+          /* Le verso est visible par défaut (rotation 0deg) */
+          transform: rotateY(0deg); 
+          
+      }
+      /* Image à l'intérieur de la face */
 
-/* Le contenu englobe les deux faces et tourne */
-.card-content {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 0.75rem;
-    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform-style: preserve-3d; /* 🔑 ESSENTIEL: active la 3D pour les enfants */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-}
+      .card-image {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          padding: 0.5rem;
+          border-radius: 0.5rem;
+      }
 
-/* Quand la carte est retournée (flip) */
-.card-container.is-flipped .card-content {
-    transform: rotateY(180deg);
-}
 
-/* Styles pour les cartes matchées (dos visible et non cliquable) */
-.card-container.is-matched-static {
-    cursor: default;
-    pointer-events: none;
-}
-.card-container.is-matched-static .card-content {
-    filter: grayscale(100%); 
-    opacity: 0.6; 
-}
-
-/* Styles communs aux faces */
-.card-face {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center; 
-    border-radius: 0.75rem; 
-    backface-visibility: hidden; /* 🔑 ESSENTIEL: masque la face opposée pendant le flip */
-    overflow: hidden;
-}
-
-/* Recto de la carte (Contenu réel) */
-.card-face-front {
-  
-    /* Le recto est tourné par défaut pour être vu APRÈS la rotation du parent. */
-    transform: rotateY(180deg); 
-}
-
-/* Verso de la carte (Couverture/Dos) */
-.card-face-back {
-    
-   
-    /* Le verso est visible par défaut (rotation 0deg) */
-    transform: rotateY(0deg); 
-}
-
-/* Image à l'intérieur de la face */
-.card-image {
-    width: 100%; 
-    height: 100%; 
-    object-fit: contain; 
-    padding: 0.5rem; 
-    border-radius: 0.5rem;
-}
-
-/* --- Responsive Layouts --- */
-@media (max-width: 550px) { 
-    .card-grid {
-        gap: 0.75rem; 
-        grid-template-columns: repeat(4, 1fr); 
-        max-width: 95vw;
-    }
-    .app-title {
-        font-size: 1.5rem;
-    }
-}
-
-/* Écran de victoire et Boutons */
-.victory-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    text-align: center;
-    padding: 1rem;
-}
-.victory-card {
-    background-color: rgba(255, 255, 255, 0.98); 
-    padding: 3rem 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    max-width: 400px;
-    width: 90%;
-}
-.victory-card h2 {
-    font-size: 2.5rem; 
-    font-weight: 800;
-    color: var(--color-success);
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-}
-.victory-card p {
-    font-size: 1.1rem;
-    color: #4B5563; 
-    margin-bottom: 1.5rem;
-}
-/* Styles de boutons (inchangés) */
-.btn {
-    padding: 0.75rem 1.5rem;
-    font-weight: 700;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: background-color 0.15s, transform 0.15s, box-shadow 0.15s;
-    border: none;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-.btn-primary {
-    background-color: var(--color-primary);
-    color: white;
-    box-shadow: 0 4px var(--color-primary-darker);
-    width: 100%;
-}
-.btn-primary:hover { 
-    background-color: var(--color-primary-dark); 
-}
-.btn-primary:active {
-    background-color: var(--color-primary-darker); 
-    transform: translateY(4px);
-    box-shadow: 0 0 var(--color-primary-darker); 
-}
-.btn-secondary {
-    margin-top: 2rem;
-    padding: 0.5rem 1.5rem;
-    font-size: 0.875rem;
-    border-radius: 0.5rem;
-    background-color: #E5E7EB; 
-    color: #4B5563; 
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-.btn-secondary:hover {
-    background-color: #D1D5DB; 
+      /* --- Responsive Layouts --- */
+      @media (max-width: 550px) { 
+          .card-grid {
+              gap: 0.75rem; 
+              grid-template-columns: repeat(4, 1fr); 
+              max-width: 95vw;
+          }
+          .app-title {
+              font-size: 1.5rem;
+          }
+      }
+      
+      /* Écran de victoire et Boutons */
+      .victory-screen {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          flex-grow: 1;
+          text-align: center;
+          padding: 1rem;
+      }
+      .victory-card {
+          background-color: rgba(255, 255, 255, 0.98); 
+          padding: 3rem 2rem;
+          border-radius: 1rem;
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+          max-width: 400px;
+          width: 90%;
+      }
+      .victory-card h2 {
+          font-size: 2.5rem; 
+          font-weight: 800;
+          color: var(--color-success);
+          margin-bottom: 0.5rem;
+          text-transform: uppercase;
+      }
+      .victory-card p {
+          font-size: 1.1rem;
+          color: #4B5563; 
+          margin-bottom: 1.5rem;
+      }
+      /* Styles de boutons */
+      .btn {
+          padding: 0.75rem 1.5rem;
+          font-weight: 700;
+          border-radius: 0.75rem;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          cursor: pointer;
+          transition: background-color 0.15s, transform 0.15s, box-shadow 0.15s;
+          border: none;
+          text-transform: uppercase;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+      }
+      .btn-primary {
+          background-color: var(--color-primary);
+          color: white;
+          box-shadow: 0 4px var(--color-primary-darker);
+          width: 100%;
+      }
+      .btn-primary:hover { 
+          background-color: var(--color-primary-dark); 
+      }
+      .btn-primary:active {
+          background-color: var(--color-primary-darker); 
+          transform: translateY(4px);
+          box-shadow: 0 0 var(--color-primary-darker); 
+      }
+      .btn-secondary {
+          margin-top: 2rem;
+          padding: 0.5rem 1.5rem;
+          font-size: 0.875rem;
+          border-radius: 0.5rem;
+          background-color: #E5E7EB; 
+          color: #4B5563; 
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      .btn-secondary:hover {
+          background-color: #D1D5DB; 
+      } 
 }
             `}</style>
       <header className="app-header">
@@ -361,7 +359,7 @@ body {
       </header>
 
       {victory === true ? (
-        // Écran de Victoire
+        // Victory Screen
         <div className="victory-screen">
           <div className="victory-card">
             <h2>Bravo !</h2>
@@ -381,7 +379,7 @@ body {
           </div>
         </div>
       ) : (
-        // Grille de Jeu
+        // Game Grid
         <section className="game-section">
           <div className="score-display">
             Coups : <span>{turns}</span>
