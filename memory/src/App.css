@@ -29,13 +29,13 @@
 /* Police et arrière-plan */
 
 :root {
-  --color-primary: #2563eb; /* blue-600 */
-  --color-primary-dark: #1e40af; /* blue-800 */
-  --color-secondary: #dc2626; /* red-500 */
-  --color-accent: #10b981; /* green-500 */
-  --color-background: #f3f4f6; /* gray-100 */
-  --color-card-back: #3b82f6; /* blue-500 */
-  --color-text-dark: #1f2937; /* gray-800 */
+  --color-primary: #2563eb;
+  --color-primary-dark: black;
+  --color-secondary: #dc2626;
+  --color-accent: #10b981;
+  --color-background: rgb(46, 155, 188);
+  --color-card-back: #3b82f6;
+  --color-text-dark: #1f2937;
 }
 
 body {
@@ -67,10 +67,9 @@ body {
   font-size: 36px;
   font-weight: 800;
   color: var(--color-primary-dark);
-  letter-spacing: 0.05em;
 }
 .app-header p {
-  color: #6b7280;
+  color: white;
   margin-top: 4px;
 }
 
