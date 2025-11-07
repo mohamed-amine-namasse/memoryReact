@@ -81,10 +81,6 @@
     grid-template-columns: repeat(4, 1fr);
     max-width: 95vw;
   }
-
-  .card-icon {
-    font-size: 48px;
-  }
 }
 
 @media (max-width: 768px) {
