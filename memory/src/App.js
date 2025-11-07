@@ -3,6 +3,9 @@ import Card from "./components/Card";
 import deck from "./cards.json";
 import "./App.css";
 
+// Temps initial en secondes
+const INITIAL_TIME = 60;
+
 const App = () => {
   // Nouvel état pour gérer l'affichage du menu/jeu
   const [isGameStarted, setIsGameStarted] = useState(false);
@@ -42,6 +45,10 @@ const App = () => {
   const [victory, setVictory] = useState(false);
   const [turns, setTurns] = useState(0);
 
+  // NOUVEAUX ÉTATS POUR LE TIMER ET GAME OVER
+  const [timer, setTimer] = useState(INITIAL_TIME);
+  const [isGameOver, setIsGameOver] = useState(false);
+
   // Détermine la taille de la grille (utile pour la réactivité, bien que la grille soit fixée à 4 colonnes)
   const gridTemplate = useMemo(() => {
     const totalCards = numPairs * 2;
@@ -66,6 +73,8 @@ const App = () => {
     setTurns(0);
     setVictory(false);
     setIsDisabled(false);
+    setTimer(INITIAL_TIME); // Réinitialise le timer
+    setIsGameOver(false); // Réinitialise l'état Game Over
     setIsGameStarted(true); // Passe à l'écran de jeu
   }, [shuffleCards, numPairs]);
 
@@ -77,8 +86,31 @@ const App = () => {
     setIsDisabled(false);
     setVictory(false);
     setTurns(0);
+    setTimer(INITIAL_TIME); // Réinitialise le timer
+    setIsGameOver(false); // Réinitialise l'état Game Over
     setIsGameStarted(false); // Retour au menu
   }, [shuffleCards, numPairs]);
+
+  // LOGIQUE DU COMPTE À REBOURS
+  useEffect(() => {
+    let intervalId;
+    if (isGameStarted && !victory && !isGameOver) {
+      intervalId = setInterval(() => {
+        setTimer((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(intervalId);
+            setIsGameOver(true); // Déclenche Game Over
+            setIsDisabled(true); // Désactive les clics
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+
+    // Nettoyage de l'intervalle lorsque le composant est démonté ou les dépendances changent
+    return () => clearInterval(intervalId);
+  }, [isGameStarted, victory, isGameOver]);
 
   // Vérification de la correspondance
   useEffect(() => {
@@ -96,7 +128,7 @@ const App = () => {
           });
         });
 
-        // CORRECTION: Réinitialiser immédiatement les choix après un match réussi
+        // Réinitialiser immédiatement les choix après un match réussi
         resetTurn();
       } else {
         setTimeout(() => {
@@ -117,17 +149,24 @@ const App = () => {
   // Vérification de victoire
   useEffect(() => {
     if (isGameStarted && cards.length > 0) {
-      // S'assurer que 'isMatched' est présent dans les cartes avant de vérifier
       const allMatched = cards.every((card) => card.isMatched);
       if (allMatched) {
         setVictory(true);
+        // La victoire désactive le timer via les dépendances du useEffect du timer
       }
     }
   }, [cards, isGameStarted]);
 
   // Gère le clic sur une carte
   const handleChoice = (cardClicked) => {
-    if (isDisabled || cardClicked.isMatched || cardClicked.id === choiceOne?.id)
+    // Les clics sont également bloqués si le jeu est terminé (Game Over ou Victoire)
+    if (
+      isDisabled ||
+      cardClicked.isMatched ||
+      cardClicked.id === choiceOne?.id ||
+      victory ||
+      isGameOver
+    )
       return;
 
     // 1. Retourne la carte cliquée
@@ -144,6 +183,13 @@ const App = () => {
     choiceOne ? setChoiceTwo(cardClicked) : setChoiceOne(cardClicked);
   };
 
+  // Convertit les secondes restantes en format M:SS
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
   // Rendu du jeu
   return (
     <div className="app-container">
@@ -152,7 +198,7 @@ const App = () => {
         <p>Trouvez toutes les paires !</p>
       </header>
 
-      {/* BLOC MODIFIÉ : Affichage conditionnel du Menu/Jeu/Victoire */}
+      {/* Affichage conditionnel du Menu/Jeu/Victoire/Game Over */}
       {!isGameStarted ? (
         // 1. Menu de sélection de la taille
         <section className="menu-section">
@@ -181,28 +227,13 @@ const App = () => {
             Commencer ({numPairs * 2} cartes)
           </button>
         </section>
-      ) : victory ? (
-        // 2. Écran de victoire
-        <div className="victory-screen-overlay">
-          <div className="victory-card">
-            <h2>🎉 Bravo ! 🎉</h2>
-            <p>
-              Vous avez complété la grille de {numPairs * 2} cartes en
-              <span>{turns}</span>
-              coups.
-            </p>
-            <button
-              className="btn start-button"
-              onClick={handleNewGame} // Retourne au menu
-            >
-              Nouvelle partie
-            </button>
-          </div>
-        </div>
       ) : (
-        // 3. Grille de jeu
+        // 2. Grille de jeu
         <section className="game-section">
           <div className="score-display">
+            {/* Affichage du Timer */}
+            <div className="time-display">Temps : {formatTime(timer)}</div>
+
             <div className="text-lg font-semibold text-gray-700">
               Coups : <span>{turns}</span>
             </div>
@@ -210,7 +241,7 @@ const App = () => {
               className="btn btn-game-secondary"
               onClick={handleNewGame} // Retourne au menu
             >
-              Recommencer (Menu)
+              Menu
             </button>
           </div>
 
@@ -227,6 +258,45 @@ const App = () => {
             ))}
           </div>
         </section>
+      )}
+
+      {/* 3. Écran de Victoire (Overlay) */}
+      {victory && (
+        <div className="overlay-screen">
+          <div className="overlay-card victory-card">
+            <h2>🎉 Bravo ! 🎉</h2>
+            <p>
+              Vous avez complété la grille de {numPairs * 2} cartes en
+              <span>{turns}</span>
+              coups.
+            </p>
+            <button
+              className="btn start-button"
+              onClick={handleNewGame} // Retourne au menu
+            >
+              Nouvelle partie
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Écran de Game Over (Overlay) */}
+      {isGameOver && !victory && (
+        <div className="overlay-screen">
+          <div className="overlay-card gameover-card">
+            <h2>⏱️ Temps écoulé !</h2>
+            <p>
+              Dommage ! Vous n'avez pas réussi à trouver toutes les paires à
+              temps.
+            </p>
+            <button
+              className="btn start-button"
+              onClick={handleNewGame} // Retourne au menu
+            >
+              Réessayer
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
