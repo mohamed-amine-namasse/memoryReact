@@ -49,13 +49,28 @@ const App = () => {
   const [timer, setTimer] = useState(INITIAL_TIME);
   const [isGameOver, setIsGameOver] = useState(false);
 
-  // Détermine la taille de la grille (utile pour la réactivité, bien que la grille soit fixée à 4 colonnes)
-  const gridTemplate = useMemo(() => {
+  // Détermine le style de la grille (colonnes et rangées)
+  const gridStyle = useMemo(() => {
     const totalCards = numPairs * 2;
-    // La hauteur de la grille s'adapte, mais nous gardons 4 colonnes.
-    if (totalCards === 8) return "grid-template-rows: repeat(2, 1fr);";
-    if (totalCards === 12) return "grid-template-rows: repeat(3, 1fr);";
-    return "grid-template-rows: repeat(4, 1fr);"; // 16 cartes
+    let columns = 4; // Par défaut : 4 colonnes
+    let rows = 2;
+
+    if (totalCards === 12) {
+      // 6 paires
+      columns = 4;
+      rows = 3;
+    } else if (totalCards === 16) {
+      // 8 paires
+      // **Pour les grands écrans : 6 colonnes (3 rangées)**
+      columns = 6;
+      rows = 3;
+    }
+
+    // Retourne l'objet de style React complet
+    return {
+      gridTemplateColumns: `repeat(${columns}, 1fr)`,
+      gridTemplateRows: `repeat(${rows}, 1fr)`,
+    };
   }, [numPairs]);
 
   // Réinitialise les choix pour le prochain tour
@@ -245,7 +260,7 @@ const App = () => {
             </button>
           </div>
 
-          <div className="card-grid" style={{ gridTemplateRows: gridTemplate }}>
+          <div className="card-grid" style={gridStyle}>
             {cards.map((card) => (
               <Card
                 key={card.id}
