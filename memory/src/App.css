@@ -38,12 +38,6 @@
   --color-text-dark: #1f2937;
 }
 
-body {
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  background-color: blue; /* Fond sombre */
-}
-
 /* Base */
 .app-container {
   min-height: 100vh;
