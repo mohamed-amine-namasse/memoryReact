@@ -183,6 +183,35 @@ body {
   background-color: #ef4444; /* red-600 */
 }
 
+.overlay-screen {
+  /* Positionnement fixe sur toute la fenêtre */
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Fond semi-transparent foncé */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  /* Le z-index doit être élevé pour passer au-dessus de tout le reste */
+  z-index: 1000;
+  overflow-y: auto; /* Permet le défilement si le contenu est trop grand */
+}
+.overlay-card {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  animation: zoomIn 0.5s ease-out forwards;
+}
+.overlay-card h2 {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
 /* Victory Screen */
 .victory-screen-overlay {
   position: fixed;
