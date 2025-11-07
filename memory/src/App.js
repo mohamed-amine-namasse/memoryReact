@@ -1,19 +1,29 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Card from "./components/Card";
 import deck from "./cards.json";
 import "./App.css";
 
 const App = () => {
+  // Nouvel état pour gérer l'affichage du menu/jeu
+  const [isGameStarted, setIsGameStarted] = useState(false);
+  // Nouvel état pour le nombre de paires sélectionnées (défaut: 8)
+  const [numPairs, setNumPairs] = useState(8);
+
   // Fonction de mélange
-  const shuffleCards = useCallback((array) => {
-    // Crée une grille double (8 cartes) et ajoute les états initiaux
-    const doubledDeck = [...array, ...array].map((card, index) => ({
-      ...card,
-      // Utilisation de l'index initial pour l'ID unique
-      id: `${card.pairId}-${index}`,
-      isFlipped: false,
-      isMatched: false,
-    }));
+  const shuffleCards = useCallback((array, count) => {
+    // Sélectionne uniquement le nombre de paires désirées
+    const initialCards = array.slice(0, count);
+
+    // Crée une grille double et ajoute les états initiaux
+    const doubledDeck = [...initialCards, ...initialCards].map(
+      (card, index) => ({
+        ...card,
+        // L'utilisation d'un index initial unique pour l'ID est maintenue
+        id: `${card.pairId}-${index}`,
+        isFlipped: false,
+        isMatched: false,
+      })
+    );
 
     // Mélange le tableau
     const shuffled = [...doubledDeck];
@@ -25,12 +35,21 @@ const App = () => {
   }, []);
 
   // Initialisation d'état
-  const [cards, setCards] = useState(() => shuffleCards(deck));
+  const [cards, setCards] = useState(() => shuffleCards(deck, 8));
   const [choiceOne, setChoiceOne] = useState(null);
   const [choiceTwo, setChoiceTwo] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
   const [victory, setVictory] = useState(false);
   const [turns, setTurns] = useState(0);
+
+  // Détermine la taille de la grille (utile pour la réactivité, bien que la grille soit fixée à 4 colonnes)
+  const gridTemplate = useMemo(() => {
+    const totalCards = numPairs * 2;
+    // La hauteur de la grille s'adapte, mais nous gardons 4 colonnes.
+    if (totalCards === 8) return "grid-template-rows: repeat(2, 1fr);";
+    if (totalCards === 12) return "grid-template-rows: repeat(3, 1fr);";
+    return "grid-template-rows: repeat(4, 1fr);"; // 16 cartes
+  }, [numPairs]);
 
   // Réinitialise les choix pour le prochain tour
   const resetTurn = useCallback(() => {
@@ -39,71 +58,77 @@ const App = () => {
     setIsDisabled(false); // Réactive les clics
   }, []);
 
-  // Gère la nouvelle partie
+  // Démarrage du jeu depuis le menu
+  const handleStartGame = useCallback(() => {
+    setCards(shuffleCards(deck, numPairs)); // Shuffle selon la sélection
+    setChoiceOne(null);
+    setChoiceTwo(null);
+    setTurns(0);
+    setVictory(false);
+    setIsDisabled(false);
+    setIsGameStarted(true); // Passe à l'écran de jeu
+  }, [shuffleCards, numPairs]);
+
+  // Gère la nouvelle partie (retour au menu)
   const handleNewGame = useCallback(() => {
-    setCards(shuffleCards(deck));
+    setCards(shuffleCards(deck, numPairs));
     setChoiceOne(null);
     setChoiceTwo(null);
     setIsDisabled(false);
     setVictory(false);
     setTurns(0);
-  }, [shuffleCards]);
+    setIsGameStarted(false); // Retour au menu
+  }, [shuffleCards, numPairs]);
 
+  // Vérification de la correspondance
   useEffect(() => {
     if (choiceOne && choiceTwo) {
-      setIsDisabled(true); // Désactive les clics pendant la vérification
+      setIsDisabled(true);
       setTurns((prevTurns) => prevTurns + 1);
 
-      // Si les cartes correspondent
       if (choiceOne.pairId === choiceTwo.pairId) {
         setCards((prevCards) => {
           return prevCards.map((card) => {
-            // Marque toutes les cartes avec le même pairId comme matchées
             if (card.pairId === choiceOne.pairId) {
-              // On définit isMatched: true et on laisse isFlipped à TRUE
-              // pour qu'elles restent visibles le temps du reset.
-              // Le composant Card se chargera de la persistance via isMatched.
-              return { ...card, isMatched: true }; // ⬅️ isFlipped: true n'est plus nécessaire ici
+              return { ...card, isMatched: true };
             }
             return card;
           });
         });
 
-        // 🔑 NOUVEAU : On réinitialise les choix immédiatement après le match
-        // SANS utiliser resetTurn, pour garder la logique de désactivation.
-        setChoiceOne(null); // Ces deux lignes vont déclencher le useEffect ci-dessous
-        setChoiceTwo(null);
+        // CORRECTION: Réinitialiser immédiatement les choix après un match réussi
+        resetTurn();
       } else {
-        // Si les cartes ne correspondent pas, les retourne après un délai
         setTimeout(() => {
           setCards((prevCards) => {
             return prevCards.map((card) => {
-              // Retourne uniquement les deux cartes actuellement sélectionnées
               if (card.id === choiceOne.id || card.id === choiceTwo.id) {
                 return { ...card, isFlipped: false };
               }
               return card;
             });
           });
-          resetTurn(); // On réinitialise les choix et réactive les clics après le retournement
+          resetTurn();
         }, 1200);
       }
     }
-  }, [choiceOne, choiceTwo, setCards, resetTurn, setTurns, setIsDisabled]); // resetTurn retiré
+  }, [choiceOne, choiceTwo, resetTurn]);
 
-  // 🔑 NOUVEAU useEffect pour gérer la réactivation du jeu après un match
-  // Cet useEffect s'exécute quand choiceOne et choiceTwo redeviennent null
+  // Vérification de victoire
   useEffect(() => {
-    // Si les deux choix sont null ET qu'il n'y a pas d'autres clics en attente (isDisabled est false)
-    if (!choiceOne && !choiceTwo && isDisabled) {
-      // Cela signifie que le tour est terminé (match ou non-match)
-      setIsDisabled(false);
+    if (isGameStarted && cards.length > 0) {
+      // S'assurer que 'isMatched' est présent dans les cartes avant de vérifier
+      const allMatched = cards.every((card) => card.isMatched);
+      if (allMatched) {
+        setVictory(true);
+      }
     }
-  }, [choiceOne, choiceTwo, isDisabled]); // Dépend de l'état des choix et de l'état de désactivation
+  }, [cards, isGameStarted]);
+
   // Gère le clic sur une carte
   const handleChoice = (cardClicked) => {
-    // 🔑 CORRECTION 2 : NE PAS TRAITER LE CLIC si la carte est matchée.
-    if (cardClicked.isMatched) return; // <-- AJOUTER CETTE VÉRIFICATION
+    if (isDisabled || cardClicked.isMatched || cardClicked.id === choiceOne?.id)
+      return;
 
     // 1. Retourne la carte cliquée
     setCards((prevCards) => {
@@ -118,43 +143,78 @@ const App = () => {
     // 2. Enregistre le choix
     choiceOne ? setChoiceTwo(cardClicked) : setChoiceOne(cardClicked);
   };
+
   // Rendu du jeu
   return (
     <div className="app-container">
-      {/* 4. DÉFINITION DES STYLES (CORRIGÉ POUR LE FLIP) */}
-
       <header className="app-header">
-        <h1 className="app-title">Jeu de Mémoire React</h1>
+        <h1 className="app-title">Jeu de Mémoire</h1>
+        <p>Trouvez toutes les paires !</p>
       </header>
 
-      {victory === true ? (
-        // Victory Screen
-        <div className="victory-screen">
+      {/* BLOC MODIFIÉ : Affichage conditionnel du Menu/Jeu/Victoire */}
+      {!isGameStarted ? (
+        // 1. Menu de sélection de la taille
+        <section className="menu-section">
+          <h2>Sélectionnez la taille de la grille</h2>
+          <div className="menu-options">
+            <button
+              onClick={() => setNumPairs(4)}
+              className={`btn menu-button ${numPairs === 4 ? "selected" : ""}`}
+            >
+              4 paires (8 cartes)
+            </button>
+            <button
+              onClick={() => setNumPairs(6)}
+              className={`btn menu-button ${numPairs === 6 ? "selected" : ""}`}
+            >
+              6 paires (12 cartes)
+            </button>
+            <button
+              onClick={() => setNumPairs(8)}
+              className={`btn menu-button ${numPairs === 8 ? "selected" : ""}`}
+            >
+              8 paires (16 cartes)
+            </button>
+          </div>
+          <button className="btn start-button" onClick={handleStartGame}>
+            Commencer ({numPairs * 2} cartes)
+          </button>
+        </section>
+      ) : victory ? (
+        // 2. Écran de victoire
+        <div className="victory-screen-overlay">
           <div className="victory-card">
-            <h2>Bravo !</h2>
+            <h2>🎉 Bravo ! 🎉</h2>
             <p>
-              Vous avez complété la grille en
-              <span
-                style={{ fontWeight: 800, color: "var(--color-primary-dark)" }}
-              >
-                {" "}
-                {turns}{" "}
-              </span>
+              Vous avez complété la grille de {numPairs * 2} cartes en
+              <span>{turns}</span>
               coups.
             </p>
-            <button className="btn btn-primary" onClick={handleNewGame}>
+            <button
+              className="btn start-button"
+              onClick={handleNewGame} // Retourne au menu
+            >
               Nouvelle partie
             </button>
           </div>
         </div>
       ) : (
-        // Game Grid
+        // 3. Grille de jeu
         <section className="game-section">
           <div className="score-display">
-            Coups : <span>{turns}</span>
+            <div className="text-lg font-semibold text-gray-700">
+              Coups : <span>{turns}</span>
+            </div>
+            <button
+              className="btn btn-game-secondary"
+              onClick={handleNewGame} // Retourne au menu
+            >
+              Recommencer (Menu)
+            </button>
           </div>
 
-          <div className="card-grid">
+          <div className="card-grid" style={{ gridTemplateRows: gridTemplate }}>
             {cards.map((card) => (
               <Card
                 key={card.id}
@@ -166,10 +226,6 @@ const App = () => {
               />
             ))}
           </div>
-
-          <button className="btn btn-secondary" onClick={handleNewGame}>
-            Recommencer la partie
-          </button>
         </section>
       )}
     </div>
