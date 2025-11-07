@@ -1,6 +1,5 @@
 import React from "react";
-// L'importation de "./style.css" a été retirée pour résoudre l'erreur de compilation,
-// car les styles sont gérés directement dans le composant parent.
+import "./style.css";
 
 function Card({ card, isFlipped, isMatched, handleChoice, isDisabled }) {
   const handleClick = () => {

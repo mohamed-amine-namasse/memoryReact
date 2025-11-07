@@ -4,5 +4,11 @@
   { "id": "3", "pairId": "dragon", "content": "./images/dragon.jpg" },
   { "id": "4", "pairId": "juge", "content": "./images/juge.jpg" },
   { "id": "5", "pairId": "guerrier", "content": "./images/guerrier.jpg" },
-  { "id": "6", "pairId": "mogmole", "content": "./images/mogmole.jpg" }
+  { "id": "6", "pairId": "mogmole", "content": "./images/mogmole.jpg" },
+  { "id": "7", "pairId": "hache", "content": "./images/hache.jpg" },
+  { "id": "8", "pairId": "hommage", "content": "./images/hommage.jpg" },
+  { "id": "9", "pairId": "trappe", "content": "./images/trappe.jpg" },
+  { "id": "10", "pairId": "dragon2", "content": "./images/dragon2.jpg" },
+  { "id": "11", "pairId": "dino", "content": "./images/dino.jpg" },
+  { "id": "12", "pairId": "jeton", "content": "./images/jeton.jpg" }
 ]

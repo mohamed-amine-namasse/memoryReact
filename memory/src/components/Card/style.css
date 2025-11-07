@@ -1,0 +1,84 @@
+/* GRILLE DE CARTES */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* COMPOSANT CARTE (Conteneur extérieur) */
+.card-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-top: 100%; /* Maintient un ratio 1:1 */
+  cursor: pointer;
+  perspective: 1000px; /* ESSENTIEL pour l'effet 3D */
+  border-radius: 0.75rem;
+}
+
+/* Le contenu englobe les deux faces et tourne */
+.card-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-style: preserve-3d; /* ESSENTIEL: active la 3D pour les enfants */
+}
+
+/* Quand la carte est retournée (flip) */
+.card-container.is-flipped .card-content {
+  transform: rotateY(180deg);
+}
+
+/* Styles pour les cartes matchées (dos visible et non cliquable) */
+.card-container.is-matched-static {
+  cursor: default;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
+/* Styles communs aux faces */
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden; /* ESSENTIEL: masque la face opposée pendant le flip */
+  overflow: hidden;
+}
+
+/* Recto de la carte (Contenu réel) */
+.card-face-front {
+  /* Le recto est tourné par défaut pour être vu APRÈS la rotation du parent. */
+  transform: rotateY(180deg);
+}
+
+/* Verso de la carte (Couverture/Dos) */
+.card-face-back {
+  /* Le verso est visible par défaut (rotation 0deg) */
+  transform: rotateY(0deg);
+}
+/* Image à l'intérieur de la face */
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+@media (max-width: 550px) {
+  .card-grid {
+    gap: 0.75rem;
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 95vw;
+  }
+}
