@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/memoryReact/static/css/main.c39ffeda.css",
-    "main.js": "/memoryReact/static/js/main.ee04ad54.js",
+    "main.css": "/memoryReact/static/css/main.31806310.css",
+    "main.js": "/memoryReact/static/js/main.7cf505a7.js",
     "index.html": "/memoryReact/index.html",
-    "main.c39ffeda.css.map": "/memoryReact/static/css/main.c39ffeda.css.map",
-    "main.ee04ad54.js.map": "/memoryReact/static/js/main.ee04ad54.js.map"
+    "main.31806310.css.map": "/memoryReact/static/css/main.31806310.css.map",
+    "main.7cf505a7.js.map": "/memoryReact/static/js/main.7cf505a7.js.map"
   },
   "entrypoints": [
-    "static/css/main.c39ffeda.css",
-    "static/js/main.ee04ad54.js"
+    "static/css/main.31806310.css",
+    "static/js/main.7cf505a7.js"
   ]
 }

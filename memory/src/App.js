@@ -260,7 +260,12 @@ const App = () => {
             </button>
           </div>
 
-          <div className="card-grid" style={gridStyle}>
+          <div
+            className={`card-grid ${
+              numPairs * 2 === 16 ? "grid-16-cards" : ""
+            }`}
+            style={gridStyle}
+          >
             {cards.map((card) => (
               <Card
                 key={card.id}

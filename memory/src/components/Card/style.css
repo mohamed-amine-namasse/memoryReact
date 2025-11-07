@@ -81,4 +81,25 @@
     grid-template-columns: repeat(4, 1fr);
     max-width: 95vw;
   }
+
+  .card-icon {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* La classe 'grid-16-cards' est appliquée au div de grille lorsque numPairs=8 (16 cartes).
+               Ceci écrase le style inline (6 colonnes) défini en JS pour les grands écrans.
+            */
+  .card-grid.grid-16-cards {
+    /* Forcer 4 colonnes, la même valeur que pour le mode 12 cartes */
+    grid-template-columns: repeat(4, 1fr) !important;
+    /* Nécessite 4 rangées pour contenir les 16 cartes */
+    grid-template-rows: repeat(4, 1fr) !important;
+  }
+  /* Assurer que la grille n'est pas trop large sur les très petits écrans */
+  .card-grid {
+    max-width: 400px;
+    margin: 20px auto;
+  }
 }

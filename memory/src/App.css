@@ -266,13 +266,7 @@
   .menu-section {
     padding: 24px;
   }
-  .card-grid {
-    gap: 8px;
-    padding: 12px;
-  }
-  .card-icon {
-    font-size: 48px;
-  }
+
   .score-display {
     font-size: 16px;
   }
