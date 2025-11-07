@@ -25,7 +25,9 @@
     transform: rotate(360deg);
   }
 }
-
+* {
+  box-sizing: border-box;
+}
 /* Police et arrière-plan */
 
 :root {
